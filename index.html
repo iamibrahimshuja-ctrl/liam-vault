@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liam's Vault (Private Demo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { background-color: #0f0f0f; color: white; font-family: 'Inter', sans-serif; }
+        .glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .result-card { transition: all 0.2s; }
+        .result-card:hover { transform: translateY(-2px); background-color: #1f2937; cursor: pointer; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            const [query, setQuery] = React.useState("");
+            const [player, setPlayer] = React.useState(null);
+            
+            const mockResults = {
+                "offers": [
+                    { time: 195, text: "the decoy offer and proof of concept offer strategy..." },
+                    { time: 1229, text: "using an intro offer for the reactivation campaign..." }
+                ],
+                "ads": [
+                    { time: 761, text: "Ads that compound — Retargeting, Lead Forms & SMS..." },
+                    { time: 784, text: "the first campaign you want to do is a retargeting campaign..." },
+                    { time: 1008, text: "getting it down to $12 to $13 a B2B lead..." },
+                    { time: 1215, text: "rotate the ads so you can keep high performance..." }
+                ],
+                "agency": [
+                    { time: 5, text: "building a highly profitable AI agency..." },
+                    { time: 78, text: "start with a service-based business like an AI agency..." },
+                    { time: 1240, text: "Most AI agencies, they either do one of two things..." },
+                    { time: 2438, text: "the actual future of AI agencies..." }
+                ]
+            };
+
+            const [results, setResults] = React.useState([]);
+
+            React.useEffect(() => {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+                window.onYouTubeIframeAPIReady = () => {
+                    const newPlayer = new YT.Player('player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: 'NuR56EZZWLs', // Liam's Video ID
+                        playerVars: { 'playsinline': 1, 'theme': 'dark' }
+                    });
+                    setPlayer(newPlayer);
+                };
+            }, []);
+
+            const handleSearch = (e) => {
+                const text = e.target.value.toLowerCase();
+                setQuery(text);
+                if (mockResults[text]) {
+                    setResults(mockResults[text]);
+                } else {
+                    setResults([]);
+                }
+            };
+
+            const jumpTo = (seconds) => {
+                if (player && player.seekTo) {
+                    player.seekTo(seconds, true);
+                    player.playVideo();
+                }
+            };
+
+            return (
+                <div className="max-w-4xl mx-auto p-6 min-h-screen flex flex-col">
+                    <header className="flex justify-between items-center mb-10 border-b border-gray-800 pb-4">
+                        <div className="flex items-center gap-3">
+                            {/* Changed the Logo to 'L' */}
+                            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl">L</div>
+                            <h1 className="text-xl font-bold tracking-tight">The Liam Ottley Vault <span className="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded ml-2">BETA</span></h1>
+                        </div>
+                        <div className="text-sm text-gray-400">Indexed: 1 Video (Demo)</div>
+                    </header>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-bold">Find specific advice instantly.</h2>
+                                {/* Updated the instructions */}
+                                <p className="text-gray-400">Stop scrolling. Search "Offers", "Ads", or "Agency" to see the AI magic.</p>
+                            </div>
+
+                            <div className="relative">
+                                <input 
+                                    type="text" 
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-5 py-4 text-lg focus:outline-none focus:border-blue-500 glow transition-all placeholder-gray-600"
+                                    placeholder="Search transcripts (e.g. 'Offers')..."
+                                    value={query}
+                                    onChange={handleSearch}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                {results.length > 0 ? (
+                                    results.map((res, i) => (
+                                        <div key={i} onClick={() => jumpTo(res.time)} className="result-card bg-gray-800 p-4 rounded-lg flex justify-between items-center group">
+                                            <div>
+                                                <div className="font-medium text-blue-400">Mentioned at {new Date(res.time * 1000).toISOString().substr(14, 5)}</div>
+                                                <div className="text-gray-300 text-sm">"...{res.text}..."</div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : query.length > 0 ? (
+                                    <div className="text-gray-500 text-center py-4">No specific matches in this demo video. Try <b>"Agency"</b>.</div>
+                                ) : (
+                                    <div className="mt-8 grid grid-cols-2 gap-2">
+                                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider col-span-2 mb-2">Suggested Searches</div>
+                                        {Object.keys(mockResults).map(key => (
+                                            <button key={key} onClick={() => {setQuery(key); setResults(mockResults[key]);}} className="text-left bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm text-gray-300 capitalize">
+                                                {key}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 h-64 md:h-auto sticky top-6">
+                            <div id="player"></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
